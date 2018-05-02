@@ -31,14 +31,15 @@ public class FileReceiveWorker implements Runnable {
     @Override
     public void run() {
         DataInputStream dis = null;
-        DataOutputStream dos = null;
         FileOutputStream fos = null;
+        BufferedWriter out = null;
 
         try {
             // 获得输入流
             dis = new DataInputStream(socket.getInputStream());
 
-            dos = new DataOutputStream(socket.getOutputStream());
+            //返回文件复制情况信息
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
             // 文件名和长度
             String fileName = dis.readUTF();
@@ -47,8 +48,8 @@ public class FileReceiveWorker implements Runnable {
             String msg = "是否接收文件来自" + socket.getInetAddress().getHostAddress() + "的文件" + fileName;
 
             if (ExceptionHandler.confirm(msg, "提示") == 0) {
-                dos.write(1);  // 回复发送端同意接收
-                dos.flush();
+                out.write("0x0000");  // 回复发送端同意接收
+                out.flush();
                 // 文件路径选择框
                 JFileChooser jfc = new JFileChooser();
                 jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -69,19 +70,19 @@ public class FileReceiveWorker implements Runnable {
                     // 开始接收文件
                     byte[] bytes = new byte[1024];
                     int length = 0;
-                    while ((length = dis.read(bytes, 0, bytes.length)) != -1) {
+                    while ((length = dis.read(bytes)) != -1) {
                         fos.write(bytes, 0, length);
                         fos.flush();
                     }
                     System.out.println("==> 文件接收成功 [File Name：" + fileName + "]");
-                    dos.write(2);  // 回复发送端接收完毕
-                    dos.flush();
+                    out.write("0x1111");  // 回复发送端接收完毕
+                    out.flush();
                 } else {
                     System.out.println("==> 未选择保存路径");
                 }
             } else {
-                dos.write(-1);  // 回复发送端拒绝接收
-                dos.flush();
+                out.write("1x0000");  // 回复发送端拒绝接收
+                out.flush();
                 System.out.println("==> 拒绝接收文件");
             }
         } catch (SocketException e) {
@@ -96,8 +97,8 @@ public class FileReceiveWorker implements Runnable {
                     fos.close();
                 if (dis != null)
                     dis.close();
-                if (dos != null)
-                    dos.close();
+                if (out != null)
+                    out.close();
                 socket.close();
             } catch (Exception e) {
             }

@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * <p></p>
@@ -96,7 +98,7 @@ public class NetUtil {
 
 
                 // 判断是否是本机
-                if (!InetAddress.getLocalHost().getHostAddress().equals(t.getIp())) {
+//                if (!InetAddress.getLocalHost().getHostAddress().equals(t.getIp())) {
                     // 加入本地缓存
                     ((HashMap<String, Terminal>) LocalCache.get(SystemParamConstant.TERMINAL_MAP)).put(t.getName(), t);
 
@@ -107,7 +109,7 @@ public class NetUtil {
                     if (SystemParamConstant.IS_BROADCAST.equals(msg.substring(msg.length() - 1))) {
                         feedback(t.getIp());
                     }
-                }
+//                }
             }
         }
     }
@@ -182,7 +184,7 @@ public class NetUtil {
     }
 
     /**
-     * 询问对方是否统一接收文件
+     * 询问对方是否同意接收文件
      *
      * @param
      * @return
@@ -217,29 +219,36 @@ public class NetUtil {
     public static void sendFile(File file) throws IOException {
         if (file.exists()) {
             FileInputStream fis = new FileInputStream(file);
-            DataOutputStream dos = new DataOutputStream(os);
-            DataInputStream dis = new DataInputStream(client.getInputStream());
+            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
 
             // 文件名和长度
             dos.writeUTF(file.getName());
             dos.flush();
             dos.writeLong(file.length());
             dos.flush();
-            transport(dos, fis, file.length());
+//            transport(dos, fis, file.length());
+//            dos.flush();
+//            client.shutdownInput();
 
-//            int i = 0;
-//
 //            while ((i = dis.readInt()) == 0) { }
+
+            //获取从服务端反馈的信息
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            String serverBack = in.readLine();
+
+            System.out.println("==> 终端响应码：" + serverBack);
+
+            if ("0x0000".equals(serverBack)) {
+                transport(dos, fis, file.length());
+            } else if ("1x0000".equals(serverBack)) {
+                ExceptionHandler.alert("对方拒绝接收文件", 3);
+            } else {
+                ExceptionHandler.alert("其他未知错误", 3);
+            }
+
+//            while ((i = dis.readInt()) == 2) {
 //
-//            if (i == 1) {
-//                transport(dos, fis, file.length());
-//            } else if (i == -1) {
-//                ExceptionHandler.alert("对方拒绝接收文件", 3);
-//            } else {
-//                ExceptionHandler.alert("其他未知错误", 3);
 //            }
-//
-//            while ((i = dis.readInt()) == 0) { }
 //            if (i == 2) {
 //                NetUtil.closeConnection();
 //            } else {
@@ -268,7 +277,7 @@ public class NetUtil {
         byte[] bytes = new byte[1024];
         int length = 0;
         long progress = 0;
-        while ((length = is.read(bytes, 0, bytes.length)) != -1) {
+        while ((length = is.read(bytes)) != -1) {
             dos.write(bytes, 0, length);
             dos.flush();
             progress += length;
@@ -309,6 +318,8 @@ public class NetUtil {
         ServerSocket serverSocket = new ServerSocket(SystemParamConstant.WORK_PORT);
         System.out.println("enable listening port");
         Socket socket;
+        //如果使用多线程，那就需要线程池，防止并发过高时创建过多线程耗尽资源
+        ExecutorService threadPool = Executors.newFixedThreadPool(10);
         while (true) {
             // server尝试接收其他Socket的连接请求，server的accept方法是阻塞式的
             socket = serverSocket.accept();
@@ -322,7 +333,7 @@ public class NetUtil {
              *
              * 每接收到一个Socket就建立一个新的线程来处理它
              */
-            new Thread(new FileReceiveWorker(socket)).start();
+            threadPool.submit(new FileReceiveWorker(socket));
         }
     }
 

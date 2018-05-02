@@ -34,7 +34,7 @@ public class MainFrame {
     private JLabel send;       // 已发送
     private JLabel speed;      // 速度
 
-    private JList<Terminal> terminalJList;  // 终端列表
+    private JList<String> terminalJList;  // 终端列表
     private JList<File> fileJList;          // 文件列表
 
     private JTextArea messageTextArea;      // 消息框
@@ -63,7 +63,7 @@ public class MainFrame {
         return frame;
     }
 
-    public JList<Terminal> getTerminalJList() {
+    public JList<String> getTerminalJList() {
         return terminalJList;
     }
 
@@ -111,8 +111,8 @@ public class MainFrame {
         frame.getContentPane().setLayout(null);
         frame.setBounds(500, 300, 835, 550);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        ImageIcon icon = new ImageIcon("icon.jpg");
-        ImageIcon icon = new ImageIcon("target/classes/icon.jpg");
+        ImageIcon icon = new ImageIcon("icon.jpg");
+//        ImageIcon icon = new ImageIcon("target/classes/icon.jpg");
         frame.setIconImage(icon.getImage());
 
         //action
@@ -125,7 +125,7 @@ public class MainFrame {
         frame.getContentPane().add(terminaListJLabel);
 
         //终端列表 list
-        terminalJList = new JList<Terminal>();
+        terminalJList = new JList<String>();
         frame.getContentPane().add(terminalJList);
 
         //终端列表滚动条

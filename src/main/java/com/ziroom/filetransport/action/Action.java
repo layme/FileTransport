@@ -15,6 +15,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p></p>
@@ -72,7 +73,7 @@ public class Action {
 
     public void refreshTerminalList(HashMap<String, Terminal> map) {
         MainFrame mainFrame = (MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME);
-        JList jList = mainFrame.getTerminalJList();
+        JList<String> jList = mainFrame.getTerminalJList();
         jList.removeAll();
         jList.setListData(map.keySet().toArray(new String[map.size()]));
     }
@@ -134,7 +135,7 @@ public class Action {
             dlm = new DefaultListModel<>();
             jList.setModel(dlm);
         }
-        File[] fileList = file.listFiles();//将该目录下的所有文件放置在一个File类型的数组中
+        File[] fileList = file.listFiles();  // 将该目录下的所有文件放置在一个File类型的数组中
         for (int i = 0; i < fileList.length; i++) {
             if (fileList[i].isFile()) {
                 dlm.addElement(fileList[i]);
@@ -144,10 +145,18 @@ public class Action {
 
     }
 
+    /**
+     * 移除一条记录
+     *
+     * @param
+     * @return
+     * @author renhy
+     * @created 2018年05月02日 15:34:28
+     */
     public void removeIndexAt(int i) {
         MainFrame mainFrame = (MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME);
         JList jList = mainFrame.getFileJList();
-        DefaultListModel<File> dlm = (DefaultListModel<File>)jList.getModel();
+        DefaultListModel<File> dlm = (DefaultListModel<File>) jList.getModel();
         dlm.remove(i);
         mainFrame.getSize().setText("0 MB");          // 文件总大小归0
         for (int j = 0; j < dlm.size(); j++) {
@@ -176,7 +185,7 @@ public class Action {
 
         mainFrame.getCount().setText("0 个");         // 文件个数归0
         mainFrame.getSize().setText("0 MB");          // 文件总大小归0
-        mainFrame.getjProgressBar().setValue(0);   // 文件总大小归0
+        mainFrame.getjProgressBar().setValue(0);      // 文件总大小归0
     }
 
     /**
@@ -188,25 +197,41 @@ public class Action {
      * @created 2018年05月02日 11:43:39
      */
     public void sendFile() {
-        ListModel<File> listModel = ((MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME)).getFileJList().getModel();
-        if (listModel.getSize() == 0) {
+        MainFrame mainFrame = (MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME);
+        JList<String> terminalList = mainFrame.getTerminalJList();
+        if (terminalList.getModel().getSize() == 0) {
+            ExceptionHandler.alert("没有终端数据，请刷新后再试", 2);
+            return;
+        }
+
+        JList<File> fileList = mainFrame.getFileJList();
+        if (fileList.getModel().getSize() == 0) {
             ExceptionHandler.alert("请添加文件至待发送文件列表", 2);
             return;
         }
 
-
         // 获取链接
-        NetUtil.getConnection((Terminal) LocalCache.get(SystemParamConstant.MASTER));
+        int index = terminalList.getSelectedIndex();
+        if (index == -1) {
+            ExceptionHandler.alert("请选择一个终端", 2);
+            return;
+        }
+        NetUtil.getConnection(
+                ((HashMap<String, Terminal>) LocalCache.get(SystemParamConstant.TERMINAL_MAP))
+                        .get(
+                                terminalList.getModel().getElementAt(index)
+                        )
+        );
 
         // 初始化流
         NetUtil.initStream();
 
         // 获取文件
-        DefaultListModel<File> dlm = (DefaultListModel<File>) listModel;
+        DefaultListModel<File> dlmFile = (DefaultListModel<File>) fileList.getModel();
 
         try {
-            for (int i = 0; i < dlm.size(); i++) {
-                NetUtil.sendFile(dlm.getElementAt(i));
+            for (int i = 0; i < dlmFile.size(); i++) {
+                NetUtil.sendFile(dlmFile.getElementAt(i));
             }
         } catch (UnknownHostException e) {
             ExceptionHandler.alert("終端IP错误", 0);
@@ -217,6 +242,8 @@ public class Action {
         } catch (IOException e) {
             ExceptionHandler.alert("网络IO错误", 0);
             e.printStackTrace();
+        } finally {
+            NetUtil.closeConnection();
         }
     }
 
@@ -234,10 +261,11 @@ public class Action {
 
     /**
      * 更新文件格式和总大小
-     * @author renhy
-     * @created 2018年05月02日 14:50:13
+     *
      * @param
      * @return
+     * @author renhy
+     * @created 2018年05月02日 14:50:13
      */
     private void updateFileCountAndSize(DefaultListModel<File> dlm, File file) {
         MainFrame mainFrame = (MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME);
