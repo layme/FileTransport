@@ -30,7 +30,7 @@ public class WorkPortListener implements Runnable {
     public void run() {
         System.out.println("thread " + id + " run...");
         try {
-            NetUtil.workPortLisrening();
+            NetUtil.workPortListening();
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {

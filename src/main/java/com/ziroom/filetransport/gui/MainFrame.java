@@ -109,7 +109,8 @@ public class MainFrame {
         frame.getContentPane().setLayout(null);
         frame.setBounds(500, 300, 835, 550);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon icon = new ImageIcon("icon.jpg");
+//        ImageIcon icon = new ImageIcon("icon.jpg");
+        ImageIcon icon = new ImageIcon("target/classes/icon.jpg");
         frame.setIconImage(icon.getImage());
 
         //action
@@ -186,10 +187,10 @@ public class MainFrame {
         frame.getContentPane().add(messageJScrollPane);
         messageJScrollPane.setViewportView(messageTextArea);
 
-        //文件列表 lable
-        fileListJLabel = new JLabel("文件列表");
+        //待发送文件列表 lable
+        fileListJLabel = new JLabel("待发送文件列表");
         fileListJLabel.setLabelFor(fileJList);
-        fileListJLabel.setBounds(270, 110, 65, 18);
+        fileListJLabel.setBounds(270, 110, 115, 18);
         frame.getContentPane().add(fileListJLabel);
 
         popupMenu = new JPopupMenu();

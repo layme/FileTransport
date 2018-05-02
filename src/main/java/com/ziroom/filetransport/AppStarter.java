@@ -8,6 +8,7 @@ import com.ziroom.filetransport.model.Terminal;
 import com.ziroom.filetransport.listener.BroadcastListener;
 
 import java.awt.*;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -27,6 +28,16 @@ import java.util.HashMap;
  * @since 1.0
  */
 public class AppStarter {
+    static {
+        String pid = ManagementFactory.getRuntimeMXBean().getName();
+        int indexOf = pid.indexOf('@');
+        if (indexOf > 0)
+        {
+            pid = pid.substring(0, indexOf);
+        }
+
+        System.out.println("Start with JVM Process ID: " + pid);
+    }
     public static void main(String[] args) {
         try {
             init();

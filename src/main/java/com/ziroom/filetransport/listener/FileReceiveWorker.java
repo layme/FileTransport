@@ -48,6 +48,7 @@ public class FileReceiveWorker implements Runnable {
 
             if (ExceptionHandler.confirm(msg, "提示") == 0) {
                 dos.write(1);  // 回复发送端同意接收
+                dos.flush();
                 // 文件路径选择框
                 JFileChooser jfc = new JFileChooser();
                 jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -74,11 +75,13 @@ public class FileReceiveWorker implements Runnable {
                     }
                     System.out.println("==> 文件接收成功 [File Name：" + fileName + "]");
                     dos.write(2);  // 回复发送端接收完毕
+                    dos.flush();
                 } else {
                     System.out.println("==> 未选择保存路径");
                 }
             } else {
                 dos.write(-1);  // 回复发送端拒绝接收
+                dos.flush();
                 System.out.println("==> 拒绝接收文件");
             }
         } catch (SocketException e) {

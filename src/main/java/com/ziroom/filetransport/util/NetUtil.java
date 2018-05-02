@@ -231,31 +231,31 @@ public class NetUtil {
             dos.flush();
             dos.writeLong(file.length());
             dos.flush();
-//            transport(dos, fis, file.length());
+            transport(dos, fis, file.length());
 
-            int i = 0;
-
-            while ((i = dis.readInt()) == 0) { }
-
-            if (i == 1) {
-                transport(dos, fis, file.length());
-            } else if (i == -1) {
-                ExceptionHandler.alert("对方拒绝接收文件", 3);
-            } else {
-                ExceptionHandler.alert("其他未知错误", 3);
-            }
-
-            while ((i = dis.readInt()) == 0) { }
-            if (i == 2) {
-                NetUtil.closeConnection();
-            } else {
-                try {
-                    Thread.sleep(10000);
-                    NetUtil.closeConnection();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+//            int i = 0;
+//
+//            while ((i = dis.readInt()) == 0) { }
+//
+//            if (i == 1) {
+//                transport(dos, fis, file.length());
+//            } else if (i == -1) {
+//                ExceptionHandler.alert("对方拒绝接收文件", 3);
+//            } else {
+//                ExceptionHandler.alert("其他未知错误", 3);
+//            }
+//
+//            while ((i = dis.readInt()) == 0) { }
+//            if (i == 2) {
+//                NetUtil.closeConnection();
+//            } else {
+//                try {
+//                    Thread.sleep(10000);
+//                    NetUtil.closeConnection();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
             fis.close();
         }
     }
@@ -310,7 +310,7 @@ public class NetUtil {
      * @author renhy
      * @created 2018年04月26日 21:23:20
      */
-    public static void workPortLisrening() throws IOException {
+    public static void workPortListening() throws IOException {
         ServerSocket serverSocket = new ServerSocket(SystemParamConstant.WORK_PORT);
         System.out.println("enable listening port");
         Socket socket;

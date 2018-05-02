@@ -108,6 +108,10 @@ public class Action {
             jList.setModel(dlm);
         }
         dlm.addElement(file);
+        mainFrame.getCount().setText(String.valueOf(dlm.size()));  // 文件个数
+
+        JLabel jLabel = mainFrame.getSize();
+        jLabel.setText(String.valueOf((Long.valueOf(jLabel.getText()) + file.length()) / 1024));  // 文件总大小
     }
 
     /**
@@ -119,8 +123,15 @@ public class Action {
      * @created 2018年04月26日 20:36:18
      */
     public void cleanFileJList() {
-        DefaultListModel<File> dlm = (DefaultListModel) (((MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME)).getFileJList().getModel());
-        dlm.removeAllElements();
+        MainFrame mainFrame = (MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME);
+        JList jList = mainFrame.getFileJList();
+        ListModel<File> listModel = jList.getModel();
+        if (listModel.getSize() > 0) {
+            ((DefaultListModel)listModel).removeAllElements();
+        }
+
+        mainFrame.getCount().setText("0");  // 文件个数归0
+        mainFrame.getSize().setText("0");   // 文件总大小归0
     }
 
     public void sendFile() {
@@ -142,6 +153,5 @@ public class Action {
             ExceptionHandler.alert("网络IO错误", 0);
             e.printStackTrace();
         }
-        NetUtil.closeConnection();
     }
 }
