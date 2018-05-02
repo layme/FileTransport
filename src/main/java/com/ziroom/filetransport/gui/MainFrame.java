@@ -24,8 +24,8 @@ public class MainFrame {
     private JLabel fileListJLabel;      // 文件列表
     private JLabel progressJLabel;      // 进度
 
-    private JLabel countJLabel;      // 文件共_个
-    private JLabel sizeJLabel;       // 总大小_MB
+    private JLabel countJLabel;      // 文件共
+    private JLabel sizeJLabel;       // 总大小
     private JLabel sendJLabel;       // 已发送_MB
     private JLabel speedJLabel;      // 速度_KB/S
 
@@ -91,6 +91,8 @@ public class MainFrame {
         return speed;
     }
 
+    public JProgressBar getjProgressBar() { return jProgressBar; }
+
     private void initGlobalFont() {
         FontUIResource fontUIResource = new FontUIResource(new Font("宋体", Font.PLAIN, 16));
         for (Enumeration<?> keys = UIManager.getDefaults().keys(); keys.hasMoreElements(); ) {
@@ -146,7 +148,7 @@ public class MainFrame {
         fileBtn = new JButton("选择文件(夹)");
         fileBtn.setBounds(438, 45, 140, 40);
         frame.getContentPane().add(fileBtn);
-        fileBtn.addActionListener((e) -> {
+        fileBtn.addActionListener(e -> {
             JFileChooser jfc = new JFileChooser();
 
             jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -156,7 +158,7 @@ public class MainFrame {
             if (file != null) {
                 if (file.isDirectory()) {
                     System.out.println("文件夹:" + file.getAbsolutePath());
-
+                    action.addFolderToList(file);
                 } else if (file.isFile()) {
                     System.out.println("文件:" + file.getAbsolutePath());
                     action.addFileToList(file);
@@ -194,50 +196,21 @@ public class MainFrame {
         frame.getContentPane().add(fileListJLabel);
 
         popupMenu = new JPopupMenu();
-        popupMenu.add(new JMenuItem("移除")); //添加菜单项
+        JMenuItem menuItem = new JMenuItem("移除");
+        menuItem.addActionListener(e -> {
+            action.removeIndexAt(fileJList.getSelectedIndex());
+        });
+        popupMenu.add(menuItem); //添加菜单项
 
         //文件列表 list
         fileJList = new JList<File>();
         frame.getContentPane().add(fileJList);
+        fileJList.add(popupMenu);
         fileJList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                super.mouseReleased(e);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                super.mouseEntered(e);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                super.mouseExited(e);
-            }
-
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                super.mouseWheelMoved(e);
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                super.mouseDragged(e);
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                super.mouseMoved(e);
+                if(e.getButton() == MouseEvent.BUTTON3 && fileJList.getSelectedIndex() >=0)
+                popupMenu.show(fileJList,e.getX(),e.getY());
             }
         });
 
@@ -253,7 +226,7 @@ public class MainFrame {
         sendBtn = new JButton("发送文件");
         sendBtn.setBounds(270, 348, 140, 40);
         frame.getContentPane().add(sendBtn);
-        sendBtn.addActionListener((e) -> {
+        sendBtn.addActionListener(e -> {
             action.sendFile();
         });
 
@@ -261,7 +234,7 @@ public class MainFrame {
         cleanBtn = new JButton("清空文件列表");
         cleanBtn.setBounds(439, 348, 140, 40);
         frame.getContentPane().add(cleanBtn);
-        cleanBtn.addActionListener((e) -> {
+        cleanBtn.addActionListener(e -> {
             action.cleanFileJList();
         });
 
@@ -274,30 +247,33 @@ public class MainFrame {
         // 进度条
         jProgressBar = new JProgressBar();
         jProgressBar.setBounds(270, 446, 526, 25);
+        jProgressBar.setStringPainted(true);
         jProgressBar.setMinimum(1);
-        jProgressBar.setMaximum(20);
+        jProgressBar.setMaximum(100);
         frame.add(jProgressBar);
 
         //文件共 lable
-        countJLabel = new JLabel("文件共    个");
+        countJLabel = new JLabel("文件共");
         countJLabel.setBounds(615, 348, 97, 18);
         frame.getContentPane().add(countJLabel);
 
         //count lable
-        count = new JLabel("0");
-        count.setBounds(665, 348, 97, 18);
+        count = new JLabel("0 个");
+        count.setBounds(670, 348, 97, 18);
         frame.getContentPane().add(count);
 
         //总大小 lable
-        sizeJLabel = new JLabel("总大小    MB");
+        sizeJLabel = new JLabel("总大小");
         sizeJLabel.setBounds(615, 370, 97, 18);
         frame.getContentPane().add(sizeJLabel);
 
         //size lable
-        size = new JLabel("0");
-        size.setBounds(665, 370, 97, 18);
+        size = new JLabel("0 MB");
+        size.setBounds(670, 370, 97, 18);
         frame.getContentPane().add(size);
 
+        /*
+        * 暂不启用
         //已发送 lable
         sendJLabel = new JLabel("已发送    MB");
         sendJLabel.setBounds(584, 418, 97, 18);
@@ -317,5 +293,6 @@ public class MainFrame {
         speed = new JLabel("0");
         speed.setBounds(735, 418, 89, 18);
         frame.getContentPane().add(speed);
+        */
     }
 }

@@ -1,6 +1,8 @@
 package com.ziroom.filetransport.util;
 
 import java.io.UnsupportedEncodingException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 /**
  * <p></p>
@@ -27,5 +29,30 @@ public class StrUtil {
 
         // 返回加密后的字符串
         return new String(chars);
+    }
+
+    public static String getFormatFileSize(long length) {
+        // 设置数字格式，保留一位有效小数
+        DecimalFormat df = new DecimalFormat("#0.0");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        df.setMinimumFractionDigits(1);
+        df.setMaximumFractionDigits(1);
+
+//        double size = ((double) length) / (1 << 30);
+//        if (size >= 1) {
+//            return df.format(size) + " GB";
+//        }
+//        size = ((double) length) / (1 << 20);
+//        if (size >= 1) {
+//            return df.format(size) + " MB";
+//        }
+//        size = ((double) length) / (1 << 10);
+//        if (size >= 1) {
+//            return df.format(size) + " KB";
+//        }
+//        return length + " B";
+
+        // MB
+        return df.format(((double) length) / (1 << 20));
     }
 }

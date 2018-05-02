@@ -38,6 +38,7 @@ public class AppStarter {
 
         System.out.println("Start with JVM Process ID: " + pid);
     }
+
     public static void main(String[] args) {
         try {
             init();

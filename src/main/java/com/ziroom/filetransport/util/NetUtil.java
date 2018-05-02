@@ -5,7 +5,6 @@ import com.ziroom.filetransport.action.Action;
 import com.ziroom.filetransport.cache.LocalCache;
 import com.ziroom.filetransport.constant.SystemParamConstant;
 import com.ziroom.filetransport.exception.ExceptionHandler;
-import com.ziroom.filetransport.gui.MainFrame;
 import com.ziroom.filetransport.listener.FileReceiveWorker;
 import com.ziroom.filetransport.model.Terminal;
 
@@ -92,12 +91,8 @@ public class NetUtil {
                 System.out.println(t.toString());
 
                 Action action = Action.getInstance();
-
                 // 添加消息
-                action.showMessage(
-                        ((MainFrame) LocalCache.get(SystemParamConstant.MAIN_FRAME)).getMessageTextArea(),
-                        t.getIp()
-                );
+                action.showMessage(t.getIp());
 
 
                 // 判断是否是本机
@@ -168,14 +163,14 @@ public class NetUtil {
     }
 
     /**
-     * 发送文件前的初始化
+     * 初始化流
      *
      * @param
      * @return
      * @author renhy
      * @created 2018年04月27日 10:42:46
      */
-    public static void prepareToSend() {
+    public static void initStream() {
         try {
             //得到socket读写流
             os = client.getOutputStream();
@@ -219,8 +214,7 @@ public class NetUtil {
      * @author renhy
      * @created 2018年04月27日 10:46:19
      */
-    public static void sendFile() throws IOException {
-        File file = new File("target/classes/icon.jpg");
+    public static void sendFile(File file) throws IOException {
         if (file.exists()) {
             FileInputStream fis = new FileInputStream(file);
             DataOutputStream dos = new DataOutputStream(os);
@@ -279,6 +273,7 @@ public class NetUtil {
             dos.flush();
             progress += length;
             System.out.print("| " + (100 * progress / fileLength) + "% |");
+            Action.getInstance().updateProgressBar((int)(100 * progress / fileLength));
         }
         System.out.println();
         System.out.println("==> 文件传输成功");
@@ -347,7 +342,7 @@ public class NetUtil {
             if (os != null) {
                 os.close();
             }
-            System.out.println("send connection closed");
+            System.out.println("Connection closed");
         } catch (IOException e) {
             ExceptionHandler.alert("关闭链接失败", 0);
             e.printStackTrace();
