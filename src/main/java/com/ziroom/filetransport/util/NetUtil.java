@@ -69,10 +69,11 @@ public class NetUtil {
      */
     public static void listening() throws IOException {
         while (true) {
-            byte[] buf = new byte[1024];//存储发来的消息
+            // 存储发来的消息
+            byte[] buf = new byte[1024];
             StringBuffer sbuf = new StringBuffer();
 
-            //绑定端口的
+            // 绑定端口的
             DatagramSocket ds = new DatagramSocket(SystemParamConstant.BROADCAST_PORT);
             DatagramPacket dp = new DatagramPacket(buf, buf.length);
             System.out.println("enable listening port");
@@ -98,7 +99,7 @@ public class NetUtil {
 
 
                 // 判断是否是本机
-//                if (!InetAddress.getLocalHost().getHostAddress().equals(t.getIp())) {
+                if (!InetAddress.getLocalHost().getHostAddress().equals(t.getIp())) {
                     // 加入本地缓存
                     ((HashMap<String, Terminal>) LocalCache.get(SystemParamConstant.TERMINAL_MAP)).put(t.getName(), t);
 
@@ -109,7 +110,7 @@ public class NetUtil {
                     if (SystemParamConstant.IS_BROADCAST.equals(msg.substring(msg.length() - 1))) {
                         feedback(t.getIp());
                     }
-//                }
+                }
             }
         }
     }

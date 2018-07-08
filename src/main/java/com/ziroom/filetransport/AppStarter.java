@@ -31,8 +31,7 @@ public class AppStarter {
     static {
         String pid = ManagementFactory.getRuntimeMXBean().getName();
         int indexOf = pid.indexOf('@');
-        if (indexOf > 0)
-        {
+        if (indexOf > 0) {
             pid = pid.substring(0, indexOf);
         }
 
@@ -47,16 +46,15 @@ public class AppStarter {
             e.printStackTrace();
         }
 
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    MainFrame mainFrame = new MainFrame();
-                    mainFrame.getFrame().setVisible(true);
-                    LocalCache.put(SystemParamConstant.MAIN_FRAME, mainFrame);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                MainFrame mainFrame = new MainFrame();
+                mainFrame.getFrame().setVisible(true);
+                LocalCache.put(SystemParamConstant.MAIN_FRAME, mainFrame);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         });
     }
 
@@ -67,7 +65,7 @@ public class AppStarter {
                 InetAddress.getLocalHost().getHostAddress()
         ));
 
-        LocalCache.put(SystemParamConstant.TERMINAL_MAP, new HashMap<String,Terminal>());
+        LocalCache.put(SystemParamConstant.TERMINAL_MAP, new HashMap<String, Terminal>());
 
         // 开启广播监听线程
         new Thread(new BroadcastListener("BroadcastListener")).start();

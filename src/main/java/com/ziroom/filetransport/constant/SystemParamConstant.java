@@ -15,11 +15,11 @@ package com.ziroom.filetransport.constant;
  * @since 1.0
  */
 public class SystemParamConstant {
-    public final static Integer BROADCAST_PORT = 80;  // 广播端口
+    public final static Integer BROADCAST_PORT = 9090;  // 广播端口
     public final static String BROADCAST_ADDRESS = "255.255.255.255";  // 广播地址
     public final static String BROADCAST_TEXT = "8a9e999062bd13e50162bd90b8aa0003";  // 广播报文
 
-    public final static Integer WORK_PORT = 76;  // 工作端口
+    public final static Integer WORK_PORT = 9091;  // 工作端口
 
     public final static String MASTER = "master";  // 本机标识
 
